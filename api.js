@@ -1,7 +1,8 @@
 import axios from "./axios.js";
 import path from "path";
 import { JsonDB, Config } from "node-json-db";
-import {executeWithRandomDelay} from './util.js'
+import { executeWithRandomDelay } from "./util.js";
+
 let db = new JsonDB(new Config("bank", true, true, "/"));
 /**
  * 作业列表
@@ -10,7 +11,10 @@ let db = new JsonDB(new Config("bank", true, true, "/"));
   @params {String} params.pageIndex 页码
 */
 export let loadTopicListData = (params) => {
-    return axios.post("https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadTopicListData", params);
+  return axios.post(
+    "https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadTopicListData",
+    params
+  );
 };
 /**
  * 习题列表
@@ -19,7 +23,10 @@ export let loadTopicListData = (params) => {
   @params {String} params.topicId 作业id
 */
 export let loadTopicData = (params) => {
-    return axios.post("https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadTopicData", params);
+  return axios.post(
+    "https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadTopicData",
+    params
+  );
 };
 /**
  * 重新答题
@@ -28,7 +35,10 @@ export let loadTopicData = (params) => {
   @params {String} params.topicId 作业id
 */
 export let loadRedoTopicData = (params) => {
-    return axios.post("https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadRedoTopicData", params);
+  return axios.post(
+    "https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/loadRedoTopicData",
+    params
+  );
 };
 
 /**
@@ -45,17 +55,20 @@ export let loadRedoTopicData = (params) => {
  * @params {String} params.studentStoreTopicId ?
  */
 export let saveOrSubmitTopicData = (params) => {
-    return axios.post("https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/saveOrSubmitTopicData", params);
-}
+  return axios.post(
+    "https://www.learnin.com.cn/app/user/student/course/space/topic/appStudentCourseTopic/saveOrSubmitTopicData",
+    params
+  );
+};
 
 //查询试题
 export let getQuestion = async (key) => {
-    let addr = `/questions/${key}`;
-    if (await db.exists(addr)) return db.getData(addr);
-    return null;
+  let addr = `/questions/${key}`;
+  if (await db.exists(addr)) return db.getData(addr);
+  return null;
 };
 
 // 保存试题
 export let saveQuestion = (params) => {
-    return db.push(`/questions/${params.questionTitle||params.id}`, params);
+  return db.push(`/questions/${params.questionTitle || params.id}`, params);
 };
