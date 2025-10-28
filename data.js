@@ -1,12 +1,16 @@
 export let disciplines = [
     {
-        name: "习近平新时代中国特色社会主义思想概论*",
-        id: "2c9080c59434d1bf01943e768c2a091b",
+        name: "创业人生*",
+        id: "2c90823a979bd6360197a534f8801aa5",
     },
     {
-        name: "网络与通信*",
-        id: "2c9080c59434d1bf01943f4152b4791e",
-    }
+        name: "公关社交礼仪*",
+        id: "2c90823a979bd6360197a57708662fd5",
+    },
+    {
+        name: "时代音画*",
+        id: "2c90823d9799eb720197a57a5a3917f0",
+    },
 ];
 // 题型 多选题 判断题 单选题 
 let questionType = ["multiple", "judgment", "single"];
