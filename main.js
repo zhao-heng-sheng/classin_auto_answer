@@ -9,6 +9,8 @@ import {
   getQuestion,
 } from "./api.js";
 
+const topicMaxScore = 100 // 作业分数，必须满足 100
+
 let getTopicList = async (courseId) => {
   let limit = 10;
   let countPage = 1;
@@ -42,9 +44,7 @@ let getTopicList = async (courseId) => {
 };
 let getTopicData = async (courseId, topicId) => {
   try {
-    console.log(courseId, topicId, "123");
     let res = await loadTopicData({ courseId, topicId });
-    console.log(res);
     let topic = res.topic;
     // 保存试题
     if (topic.state == "02") {
@@ -64,7 +64,7 @@ let getTopicData = async (courseId, topicId) => {
     let submitType =
       topic.state == "11"
         ? "1"
-        : topic.state == "02" && topic.topicScore < 80
+        : topic.state == "02" && topic.topicScore < topicMaxScore
         ? "2"
         : "0";
     return {
@@ -98,7 +98,7 @@ let submitAnswer = async (
 
   if (studentStoreTopicId) req.studentStoreTopicId = studentStoreTopicId;
   if (studentCardTopicId) req.studentCardTopicId = studentCardTopicId;
-  console.log(req, "req");
+  // console.log(req, "req");
   let res = await executeWithRandomDelay(saveOrSubmitTopicData, req);
   // let res = await saveOrSubmitTopicData(req);
   // console.log(res);
@@ -112,7 +112,7 @@ let submitAnswer = async (
   //未录入题数大于1时，重新提交
   if (
     (count > 1 && !topic.topicScore) ||
-    (topic.topicScore && topic.topicScore < 90)
+    (topic.topicScore && topic.topicScore < topicMaxScore)
   ) {
     console.log(count,topic, "未录入题数大于1时，重新提交");
     await againSubmitAnswer(
@@ -138,7 +138,7 @@ let againSubmitAnswer = async (
     topicId
   ));
   let res = await loadRedoTopicData({ courseId, topicId });
-  console.log(res, "res");
+  // console.log(res, "res");
   studentStoreTopicId = res.topic.studentStoreTopicId;
   studentCardTopicId = res.topic.studentCardTopicId;
   if (res.topic.topicItems) topicData = res.topic.topicItems;
@@ -153,35 +153,38 @@ let againSubmitAnswer = async (
 };
 (async () => {
   try {
-    for (let discipline of disciplines) {
-      let topicList = await getTopicList(discipline.id);
-      for (let topic of topicList) {
-        if (topic.topicScore && topic.topicScore > 80) continue;
-        await randomDelay();
-        let { topicData, submitType, studentStoreTopicId, studentCardTopicId } =
-          await getTopicData(discipline.id, topic.id);
-        if (submitType == "1") {
-          await submitAnswer(
-            topicData,
-            discipline.id,
-            topic.id,
-            studentStoreTopicId,
-            studentCardTopicId,
-            topic
-          );
-        }
-        if (submitType == "2") {
-          console.log(submitType, "submitType==2时，重做");
-          await againSubmitAnswer(
-            topicData,
-            discipline.id,
-            topic.id,
-            studentStoreTopicId,
-            studentCardTopicId
-          );
-        }
+    async function finishSingleTopic(discipline,topic) {
+      if (topic.topicScore && topic.topicScore == topicMaxScore) return;
+      await randomDelay();
+      let { topicData, submitType, studentStoreTopicId, studentCardTopicId } =
+        await getTopicData(discipline.id, topic.id);
+      if (submitType == "1") {
+        await submitAnswer(
+          topicData,
+          discipline.id,
+          topic.id,
+          studentStoreTopicId,
+          studentCardTopicId,
+          topic
+        );
+      }
+      if (submitType == "2") {
+        console.log("submitType==2时，重做");
+        await againSubmitAnswer(
+          topicData,
+          discipline.id,
+          topic.id,
+          studentStoreTopicId,
+          studentCardTopicId
+        );
       }
     }
+    async function handleFinishTopic(discipline){
+      let topicList = await getTopicList(discipline.id);
+      await Promise.all(topicList.map(item => finishSingleTopic(discipline,item)))
+    }
+    await Promise.all(disciplines.map(item => handleFinishTopic(item)))
+    console.log("完成所有作业");
   } catch (error) {
     console.error("主流程执行出错:", error);
   }
