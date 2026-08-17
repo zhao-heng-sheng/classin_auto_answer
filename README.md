@@ -1,3 +1,5 @@
+
+
 classin答题
 
 ### 注意
@@ -7,7 +9,11 @@ classin答题
 
 ### 使用
 
-1. 进入classin网页，找个请求拿到Cookie和Authorization，创建.env文件，填入.env里面
+1. 进入classin网页，找个请求拿到Cookie和Authorization，创建 `.env` 文件并按如下格式填入：
+    ```env
+    Authorization=<your_authorization>
+    Cookie=<your_cookie>
+    ```
     ![image-20240910155657567](http://os.zhaohs.cn/markdown/202409101557770.png)
 2. data.js里面disciplines数组填入课程名和对应id（id如图所示）
    ![image-20240910160032486](http://os.zhaohs.cn/markdown/202409101600533.png)
